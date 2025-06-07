@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IPTV Player</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      font-family: sans-serif;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 75vh;
+      max-height: 500px;
+      margin: auto;
+      overflow: hidden;
+      background: #000;
+    }
+
+    video::-webkit-media-controls-time-remaining-display,
+    video::-webkit-media-controls-current-time-display {
+      display: none;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: object-fit 0.5s ease-in-out;
+      background-color: black;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+      align-items: center;
+    }
+
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(50, 40, 30, 0.8);
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .mute-btn {
+      background: rgba(50, 40, 30, 0.8);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .live-badge {
+      background: red;
+      color: white;
+      padding: 6px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 30px;
+      line-height: 1;
+      display: inline-block;
+      height: 28px;
+      letter-spacing: 1px;
+    }
+
+    .watermark {
+      position: absolute;
+      top: 40%;
+      left: 20px;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      z-index: 10;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="video-container">
+    <video id="liveVideo" autoplay muted playsinline controls>
+      <source src="https://live-bhojpuri.akamaized.net/liveabr/playlist.m3u8" type="application/x-mpegURL">
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="controls">
+      <button class="control-btn" onclick="cycleZoom()">🔁</button>
+      <button class="control-btn" onclick="toggleFullscreen()">⛶</button>
+      <button class="control-btn" onclick="togglePiP()">📺</button>
+      <button class="mute-btn" onclick="toggleMute()" id="muteBtn">🔇</button>
+      <div class="live-badge"> ‎ ‎ ‎ ‎ ‎  ‎LIVE</div>
+    </div>
+
+    <div class="watermark">NadimRazaTV</div>
+  </div>
+
+  <script>
+    const video = document.getElementById('liveVideo');
+    const muteBtn = document.getElementById('muteBtn');
+    const zoomModes = ['contain', 'cover', 'fill'];
+    let zoomIndex = 0;
+
+    function cycleZoom() {
+      zoomIndex = (zoomIndex + 1) % zoomModes.length;
+      video.style.objectFit = zoomModes[zoomIndex];
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        video.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function togglePiP() {
+      if (document.pictureInPictureElement) {
+        document.exitPictureInPicture();
+      } else {
+        video.requestPictureInPicture().catch(error => console.error(error));
+      }
+    }
+
+    function toggleMute() {
+      video.muted = !video.muted;
+      muteBtn.textContent = video.muted ? '🔇' : '🔊';
+    }
+
+    video.addEventListener('waiting', () => {
+      console.log('Buffering...');
+    });
+
+    video.addEventListener('canplay', () => {
+      console.log('Can Play');
+      video.play();
+    });
+  </script>
+</body>
+</html>
